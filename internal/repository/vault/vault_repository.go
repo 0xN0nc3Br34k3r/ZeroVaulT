@@ -1,6 +1,8 @@
 package vault
 
 import (
+	"fmt"
+
 	"github.com/0xN0nc3Br34k3r/ZeroVaulT/internal/repository"
 	"go.etcd.io/bbolt"
 )
@@ -29,4 +31,23 @@ func (v *VaultRepository) CreateBucket(bucketName string) error {
 	})
 
 	return err
+}
+
+// InsertData inserts a new key-value pair into the specified bucket.
+// The operation fails if the bucket does not exist or if the key
+// already exists. Returns an error if the write transaction fails.
+func (v *VaultRepository) InsertData(bucketName, key, value string) error {
+	return v.db.Update(func(tx *bbolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketName))
+		if bucket == nil {
+			return fmt.Errorf("bucket %s does not exist", bucketName)
+		}
+
+		// Prevent accidental overwrites
+		if bucket.Get([]byte(key)) != nil {
+			return fmt.Errorf("key %s already exists", key)
+		}
+
+		return bucket.Put([]byte(key), []byte(value))
+	})
 }
