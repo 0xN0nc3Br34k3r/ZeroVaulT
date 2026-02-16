@@ -44,6 +44,8 @@ VaultFormat: ` + VaultFormat + `
 Crypto:      ` + Argon2Version + `, ` + AESVersion + `
 `,
 	)
+
+	rootCommand.AddCommand(initCommand)
 }
 
 // Execute is called by main.go
