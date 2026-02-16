@@ -51,3 +51,28 @@ func (v *VaultRepository) InsertData(bucketName, key, value string) error {
 		return bucket.Put([]byte(key), []byte(value))
 	})
 }
+
+// GetData retrieves the value associated with the given key from the
+// specified bucket. This method performs a read‑only transaction and
+// returns the stored value as a string.
+func (v *VaultRepository) GetData(bucketName, key string) (string, error) {
+	var result string
+
+	// Start a read-only transaction
+	err := v.db.View(func(tx *bbolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketName))
+		if bucket == nil {
+			return fmt.Errorf("bucket %s does not exist", bucketName)
+		}
+
+		value := bucket.Get([]byte(key))
+		if value == nil {
+			return fmt.Errorf("key %s does not exist", key)
+		}
+
+		result = string(value)
+		return nil
+	})
+
+	return result, err
+}
