@@ -78,4 +78,6 @@ func init() {
 	// Optional fields without shorthand flags.
 	CreateSecretItemCommand.Flags().StringVar(&Notes, "notes", "", "notes")
 	CreateSecretItemCommand.Flags().StringVar(&TOTPSecret, "totp", "", "TOTP secret")
+
+	ReadSecretItemCommand.MarkFlagRequired("key")
 }
