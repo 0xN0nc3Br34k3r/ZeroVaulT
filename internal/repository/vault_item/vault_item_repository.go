@@ -97,3 +97,31 @@ func (v *VaultItemRepository) GetAllData(bucketName string) (map[string]string, 
 
 	return result, nil
 }
+
+// Delete removes a specific key from the given bucket.
+// It opens a write transaction, verifies that the bucket exists,
+// and checks whether the target key is present before attempting
+// deletion. Returns an error if the bucket is missing, the key
+// does not exist, or if the write transaction fails.
+func (v *VaultItemRepository) Delete(bucketName, key string) error {
+	err := v.db.Update(func(tx *bbolt.Tx) error {
+		b := tx.Bucket([]byte(bucketName))
+		if b == nil {
+			return fmt.Errorf("bucket %s does not exist", bucketName)
+		}
+
+		value := b.Get([]byte(key))
+		if value == nil {
+			return fmt.Errorf("key %s does not exist", key)
+		}
+
+		return b.Delete([]byte(key))
+
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
