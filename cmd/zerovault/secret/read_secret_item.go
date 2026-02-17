@@ -82,4 +82,7 @@ func init() {
 		"",
 		"unique item name",
 	)
+
+	ReadSecretItemCommand.MarkFlagRequired("key")
+
 }
