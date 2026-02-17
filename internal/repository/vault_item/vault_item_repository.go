@@ -67,3 +67,33 @@ func (v *VaultItemRepository) GetData(bucketName, key string) (string, error) {
 
 	return result, err
 }
+
+// GetAllData returns all key‑value pairs from the specified bucket.
+// It performs a read‑only transaction and iterates through the bucket
+// using a cursor. Returns an error if the bucket does not exist or
+// if the read transaction fails.
+func (v *VaultItemRepository) GetAllData(bucketName string) (map[string]string, error) {
+	result := make(map[string]string)
+
+	err := v.db.View(func(tx *bbolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketName))
+		if bucket == nil {
+			return fmt.Errorf("bucket %s does not exist", bucketName)
+		}
+
+		// Create a cursor to iterate over all key/value pairs
+		c := bucket.Cursor()
+
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			result[string(k)] = string(v)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
