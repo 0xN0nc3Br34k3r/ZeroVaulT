@@ -6,7 +6,7 @@ import (
 
 	sharedflags "github.com/0xN0nc3Br34k3r/ZeroVaulT/cmd/zerovault/shared"
 	"github.com/0xN0nc3Br34k3r/ZeroVaulT/internal/security"
-	vaultService "github.com/0xN0nc3Br34k3r/ZeroVaulT/internal/services/vault_item"
+	vaultItemService "github.com/0xN0nc3Br34k3r/ZeroVaulT/internal/services/vault_item"
 
 	"github.com/spf13/cobra"
 )
@@ -38,7 +38,7 @@ securely before the item is created.`,
 
 		// Attempt to create the secret item using the vault service.
 		// All collected flags are passed directly to the service layer.
-		err := vaultService.CreateSecretItem(
+		err := vaultItemService.CreateSecretItem(
 			db,
 			sharedflags.MasterPassword,
 			ItemName,
