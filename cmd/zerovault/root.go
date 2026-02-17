@@ -6,6 +6,7 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/0xN0nc3Br34k3r/ZeroVaulT/cmd/zerovault/secret"
 	"github.com/0xN0nc3Br34k3r/ZeroVaulT/internal/repository"
 	"github.com/0xN0nc3Br34k3r/ZeroVaulT/internal/services"
 	"github.com/spf13/cobra"
@@ -14,8 +15,6 @@ import (
 // db is the global database handle shared across all commands.
 // It is lazily initialized in PersistentPreRun.
 var db *repository.Database
-
-var masterPassword string
 
 // Build metadata — these values are replaced at build time using ldflags.
 var (
@@ -87,10 +86,15 @@ Crypto:      ` + Argon2Version + `, ` + AESVersion + `
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		// Inject DB into secret package
+		secret.InjectDB(db)
 	}
 
-	registerCommand.Flags().StringVarP(&masterPassword, "password", "p", "", "specify the master password used to unlock the vault")
 	rootCommand.AddCommand(registerCommand)
+
+	rootCommand.AddCommand(SecretCommand)
+	SecretCommand.AddCommand(secret.CreateSecretItemCommand)
 }
 
 // Execute is called by main.go and starts the CLI.
