@@ -3,6 +3,9 @@ package zerovault
 import (
 	"log"
 
+	sharedflags "github.com/0xN0nc3Br34k3r/ZeroVaulT/cmd/zerovault/shared"
+
+	"github.com/0xN0nc3Br34k3r/ZeroVaulT/internal/security"
 	"github.com/0xN0nc3Br34k3r/ZeroVaulT/internal/services/vault"
 	"github.com/spf13/cobra"
 )
@@ -23,13 +26,17 @@ exists, registration will fail to prevent accidental overwrites.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// Basic validation: ensure the user actually provided a password.
-		if masterPassword == "" {
-			log.Fatal("master password cannot be empty; use --password to provide one")
+		if sharedflags.MasterPassword == "" {
+			pw, err := security.PromptHidden("Enter master password: ")
+			if err != nil {
+				log.Fatal(err)
+			}
+			sharedflags.MasterPassword = pw
 		}
 
 		// Attempt to register the vault. If registration fails (e.g., vault already exists),
 		// the error is logged and the program exits.
-		if err := vault.Register(db, masterPassword); err != nil {
+		if err := vault.Register(db, sharedflags.MasterPassword); err != nil {
 			log.Fatal(err)
 		}
 
