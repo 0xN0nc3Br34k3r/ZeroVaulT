@@ -125,3 +125,27 @@ func (v *VaultItemRepository) Delete(bucketName, key string) error {
 
 	return nil
 }
+
+// UpdateData overwrites the value associated with the given key in the
+// specified bucket. It opens a write transaction, verifies that the
+// bucket exists, and ensures the target key is already present before
+// performing the update.
+//
+// This prevents accidental creation of new records when the intention
+// is to modify an existing one. Returns an error if the bucket is
+// missing, the key does not exist, or if the write transaction fails.
+func (v *VaultItemRepository) UpdateData(bucketName, key, value string) error {
+	return v.db.Update(func(tx *bbolt.Tx) error {
+		b := tx.Bucket([]byte(bucketName))
+		if b == nil {
+			return fmt.Errorf("bucket %s does not exist", bucketName)
+		}
+
+		// Ensure the key exists before updating
+		if b.Get([]byte(key)) == nil {
+			return fmt.Errorf("key %s does not exist", key)
+		}
+
+		return b.Put([]byte(key), []byte(value))
+	})
+}
