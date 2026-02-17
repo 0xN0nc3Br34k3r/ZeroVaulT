@@ -78,4 +78,7 @@ func init() {
 		"",
 		"unique item name",
 	)
+
+	DeleteSecretItemCommand.MarkFlagRequired("key")
+
 }
