@@ -97,6 +97,7 @@ Crypto:      ` + Argon2Version + `, ` + AESVersion + `
 	SecretCommand.AddCommand(secret.CreateSecretItemCommand)
 	SecretCommand.AddCommand(secret.ReadSecretItemCommand)
 	SecretCommand.AddCommand(secret.ReadAllSecretItemCommand)
+	SecretCommand.AddCommand(secret.DeleteSecretItemCommand)
 }
 
 // Execute is called by main.go and starts the CLI.
